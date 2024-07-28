@@ -17,8 +17,10 @@ extends CharacterBody3D
 @export var JUMP_ANIMATION : AnimationPlayer
 @export var CROUCH_ANIMATION : AnimationPlayer
 @export var RIGHT_HAND_ANIMATION : AnimationPlayer
+@export var LEFT_HAND_ANIMATION : AnimationPlayer
 @export var COLLISION_MESH : CollisionShape3D
-@onready var hitbox = $Head/Camera/RightHand/RightHandMesh/Hitbox
+@onready var hitbox_right = $Head/Camera/RightHand/RightHandMesh/Hitbox
+@onready var hitbox_left = $Head/Camera/LeftHand/LeftHandMesh/Hitbox
 
 @export_group("Controls")
 # We are using UI controls because they are built into Godot Engine so they can be used right away
@@ -30,7 +32,8 @@ extends CharacterBody3D
 @export var PAUSE : String = "ui_cancel"
 @export var CROUCH : String = "crouch"
 @export var SPRINT : String = "sprint"
-@export var ATTACK : String = "right_hand_action"
+@export var ATTACK_RIGHT : String = "right_hand_action"
+@export var ATTACK_LEFT : String = "left_hand_action"
 
 @export_group("Feature Settings")
 @export var jumping_enabled : bool = true
@@ -82,7 +85,8 @@ func _ready():
 	JUMP_ANIMATION.play("RESET")
 	CROUCH_ANIMATION.play("RESET")
 	RIGHT_HAND_ANIMATION.play("RESET")
-	
+	LEFT_HAND_ANIMATION.play("RESET")
+
 	check_controls()
 
 func check_controls(): # If you add a control, you might want to add a check for it here.
@@ -111,7 +115,10 @@ func check_controls(): # If you add a control, you might want to add a check for
 	if !InputMap.has_action(SPRINT):
 		push_error("No control mapped for sprint. Please add an input map control. Disabling sprinting.")
 		sprint_enabled = false
-	if !InputMap.has_action(ATTACK):
+	if !InputMap.has_action(ATTACK_RIGHT):
+		push_error("No control mapped for attack. Please add an input map control. Disabling action.")
+		action_enabled = false
+	if !InputMap.has_action(ATTACK_LEFT):
 		push_error("No control mapped for attack. Please add an input map control. Disabling action.")
 		action_enabled = false
 
@@ -326,7 +333,11 @@ func _process(delta):
 	
 	if Input.is_action_just_pressed("right_hand_action"):
 		RIGHT_HAND_ANIMATION.play("Right_Hand_Punch")
-		hitbox.monitoring = true
+		hitbox_right.monitoring = true
+		
+	if Input.is_action_just_pressed("left_hand_action"):
+		LEFT_HAND_ANIMATION.play("Left_Hand_Punch")
+		hitbox_left.monitoring = true
 
 func _unhandled_input(event):
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
@@ -336,7 +347,12 @@ func _unhandled_input(event):
 func _on_right_hand_animation_animation_finished(anim_name):
 	if anim_name == "Right_Hand_Punch":
 		RIGHT_HAND_ANIMATION.play("RESET")
-		hitbox.monitoring = false
+		hitbox_right.monitoring = false
+
+func _on_left_hand_animation_animation_finished(anim_name):
+	if anim_name == "Left_Hand_Punch":
+		LEFT_HAND_ANIMATION.play("RESET")
+		hitbox_left.monitoring = false
 
 func _on_hitbox_area_entered(area):
 	if area.is_in_group("npc"):

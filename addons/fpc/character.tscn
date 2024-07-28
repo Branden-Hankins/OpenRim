@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://cc1m2a1obsyn4"]
+[gd_scene load_steps=29 format=3 uid="uid://cc1m2a1obsyn4"]
 
 [ext_resource type="Script" path="res://addons/fpc/character.gd" id="1_0t4e8"]
 [ext_resource type="Script" path="res://addons/fpc/EditorModule.gd" id="3_v3ckk"]
@@ -149,6 +149,7 @@ _data = {
 }
 
 [sub_resource type="BoxMesh" id="BoxMesh_dlyve"]
+material = SubResource("StandardMaterial3D_kp17n")
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_lwqjo"]
 points = PackedVector3Array(-0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5)
@@ -433,6 +434,92 @@ _data = {
 "Right_Hand_Punch": SubResource("Animation_m8tp0")
 }
 
+[sub_resource type="Animation" id="Animation_dcdoy"]
+resource_name = "Left_Hand_Punch"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera/LeftHand:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Camera/LeftHand/LeftHandMesh:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0.371788, -0.35346, -0.326012), Vector3(0.34139, -0.0929193, -0.31412)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Camera/LeftHand/LeftHandMesh:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(-0.364084, 1.31442, -0.430588), Vector3(-0.282061, 1.31442, -0.697667)]
+}
+
+[sub_resource type="Animation" id="Animation_x1uip"]
+resource_name = "RESET"
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera/LeftHand:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Camera/LeftHand/LeftHandMesh:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.371788, -0.35346, -0.326012)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Camera/LeftHand/LeftHandMesh:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(-0.364084, 1.31442, -0.430588)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_elkyj"]
+_data = {
+"Left_Hand_Punch": SubResource("Animation_dcdoy"),
+"RESET": SubResource("Animation_x1uip")
+}
+
 [sub_resource type="Theme" id="Theme_wdf0f"]
 MarginContainer/constants/margin_bottom = 10
 MarginContainer/constants/margin_left = 10
@@ -441,7 +528,7 @@ MarginContainer/constants/margin_top = 10
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_k4wwl"]
 
-[node name="Character" type="CharacterBody3D" node_paths=PackedStringArray("HEAD", "CAMERA", "HEADBOB_ANIMATION", "JUMP_ANIMATION", "CROUCH_ANIMATION", "RIGHT_HAND_ANIMATION", "COLLISION_MESH")]
+[node name="Character" type="CharacterBody3D" node_paths=PackedStringArray("HEAD", "CAMERA", "HEADBOB_ANIMATION", "JUMP_ANIMATION", "CROUCH_ANIMATION", "RIGHT_HAND_ANIMATION", "LEFT_HAND_ANIMATION", "COLLISION_MESH")]
 script = ExtResource("1_0t4e8")
 default_reticle = "res://addons/fpc/reticles/reticle_1.tscn"
 HEAD = NodePath("Head")
@@ -450,6 +537,7 @@ HEADBOB_ANIMATION = NodePath("Head/HeadbobAnimation")
 JUMP_ANIMATION = NodePath("Head/JumpAnimation")
 CROUCH_ANIMATION = NodePath("CrouchAnimation")
 RIGHT_HAND_ANIMATION = NodePath("Head/RightHandAnimation")
+LEFT_HAND_ANIMATION = NodePath("Head/LeftHandAnimation")
 COLLISION_MESH = NodePath("Collision")
 
 [node name="Mesh" type="MeshInstance3D" parent="."]
@@ -484,6 +572,20 @@ monitoring = false
 transform = Transform3D(1, 0, 0, 1.49012e-08, 1, -2.38419e-07, 0, 0, 1, 0, 0, 0)
 shape = SubResource("ConvexPolygonShape3D_lwqjo")
 
+[node name="LeftHand" type="Node3D" parent="Head/Camera"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5, 0)
+
+[node name="LeftHandMesh" type="MeshInstance3D" parent="Head/Camera/LeftHand"]
+transform = Transform3D(0.176517, 0.0344554, -0.161249, -0.0566934, 0.167695, -0.181641, 0.041564, 0.0824091, 0.437042, -0.364084, 1.31442, -0.430588)
+mesh = SubResource("BoxMesh_dlyve")
+
+[node name="Hitbox" type="Area3D" parent="Head/Camera/LeftHand/LeftHandMesh"]
+monitoring = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Head/Camera/LeftHand/LeftHandMesh/Hitbox"]
+transform = Transform3D(1, -1.49012e-08, -7.45058e-09, 1.49012e-08, 1, 0, 7.45058e-09, -1.11022e-16, 1, 0, 0, 0)
+shape = SubResource("ConvexPolygonShape3D_lwqjo")
+
 [node name="HeadbobAnimation" type="AnimationPlayer" parent="Head"]
 libraries = {
 "": SubResource("AnimationLibrary_o0unb")
@@ -499,6 +601,11 @@ speed_scale = 4.0
 [node name="RightHandAnimation" type="AnimationPlayer" parent="Head"]
 libraries = {
 "": SubResource("AnimationLibrary_ir6tu")
+}
+
+[node name="LeftHandAnimation" type="AnimationPlayer" parent="Head"]
+libraries = {
+"": SubResource("AnimationLibrary_elkyj")
 }
 
 [node name="UserInterface" type="Control" parent="."]
@@ -535,4 +642,6 @@ target_position = Vector3(0, 0.5, 0)
 script = ExtResource("3_v3ckk")
 
 [connection signal="area_entered" from="Head/Camera/RightHand/RightHandMesh/Hitbox" to="." method="_on_hitbox_area_entered"]
+[connection signal="area_entered" from="Head/Camera/LeftHand/LeftHandMesh/Hitbox" to="." method="_on_hitbox_area_entered"]
 [connection signal="animation_finished" from="Head/RightHandAnimation" to="." method="_on_right_hand_animation_animation_finished"]
+[connection signal="animation_finished" from="Head/LeftHandAnimation" to="." method="_on_left_hand_animation_animation_finished"]
