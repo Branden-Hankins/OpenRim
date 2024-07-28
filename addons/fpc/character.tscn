@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://cc1m2a1obsyn4"]
+[gd_scene load_steps=26 format=3 uid="uid://cc1m2a1obsyn4"]
 
 [ext_resource type="Script" path="res://addons/fpc/character.gd" id="1_0t4e8"]
 [ext_resource type="Script" path="res://addons/fpc/EditorModule.gd" id="3_v3ckk"]
@@ -147,6 +147,11 @@ _data = {
 "RESET": SubResource("Animation_j8cx7"),
 "crouch": SubResource("Animation_5ec5e")
 }
+
+[sub_resource type="BoxMesh" id="BoxMesh_dlyve"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_lwqjo"]
+points = PackedVector3Array(-0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5)
 
 [sub_resource type="Animation" id="Animation_gh776"]
 resource_name = "RESET"
@@ -343,6 +348,91 @@ _data = {
 "land_right": SubResource("Animation_vsknp")
 }
 
+[sub_resource type="Animation" id="Animation_6ir8o"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera/RightHand:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Camera/RightHand/RightHandMesh:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.567907, 0.245745, -0.0526456)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Camera/RightHand/RightHandMesh:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.302783, 1.3731, -0.425853)]
+}
+
+[sub_resource type="Animation" id="Animation_m8tp0"]
+resource_name = "Right_Hand_Punch"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera/RightHand:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Camera/RightHand/RightHandMesh:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0.567907, 0.245745, -0.0526456), Vector3(0.213519, 0.378767, 0.0640275)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Camera/RightHand/RightHandMesh:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0.302783, 1.3731, -0.425853), Vector3(0.302783, 1.3731, -0.717059)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ir6tu"]
+_data = {
+"RESET": SubResource("Animation_6ir8o"),
+"Right_Hand_Punch": SubResource("Animation_m8tp0")
+}
+
 [sub_resource type="Theme" id="Theme_wdf0f"]
 MarginContainer/constants/margin_bottom = 10
 MarginContainer/constants/margin_left = 10
@@ -351,7 +441,7 @@ MarginContainer/constants/margin_top = 10
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_k4wwl"]
 
-[node name="Character" type="CharacterBody3D" node_paths=PackedStringArray("HEAD", "CAMERA", "HEADBOB_ANIMATION", "JUMP_ANIMATION", "CROUCH_ANIMATION", "COLLISION_MESH")]
+[node name="Character" type="CharacterBody3D" node_paths=PackedStringArray("HEAD", "CAMERA", "HEADBOB_ANIMATION", "JUMP_ANIMATION", "CROUCH_ANIMATION", "RIGHT_HAND_ANIMATION", "COLLISION_MESH")]
 script = ExtResource("1_0t4e8")
 default_reticle = "res://addons/fpc/reticles/reticle_1.tscn"
 HEAD = NodePath("Head")
@@ -359,6 +449,7 @@ CAMERA = NodePath("Head/Camera")
 HEADBOB_ANIMATION = NodePath("Head/HeadbobAnimation")
 JUMP_ANIMATION = NodePath("Head/JumpAnimation")
 CROUCH_ANIMATION = NodePath("CrouchAnimation")
+RIGHT_HAND_ANIMATION = NodePath("Head/RightHandAnimation")
 COLLISION_MESH = NodePath("Collision")
 
 [node name="Mesh" type="MeshInstance3D" parent="."]
@@ -379,6 +470,20 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 
 [node name="Camera" type="Camera3D" parent="Head"]
 
+[node name="RightHand" type="Node3D" parent="Head/Camera"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5, 0)
+
+[node name="RightHandMesh" type="MeshInstance3D" parent="Head/Camera/RightHand"]
+transform = Transform3D(0.182728, 0.0345252, 0.102546, -0.00842863, 0.159954, -0.268935, -0.051375, 0.0965554, 0.408851, 0.302783, 1.3731, -0.425853)
+mesh = SubResource("BoxMesh_dlyve")
+
+[node name="Hitbox" type="Area3D" parent="Head/Camera/RightHand/RightHandMesh"]
+monitoring = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Head/Camera/RightHand/RightHandMesh/Hitbox"]
+transform = Transform3D(1, 0, 0, 1.49012e-08, 1, -2.38419e-07, 0, 0, 1, 0, 0, 0)
+shape = SubResource("ConvexPolygonShape3D_lwqjo")
+
 [node name="HeadbobAnimation" type="AnimationPlayer" parent="Head"]
 libraries = {
 "": SubResource("AnimationLibrary_o0unb")
@@ -390,6 +495,11 @@ libraries = {
 "": SubResource("AnimationLibrary_qeg5r")
 }
 speed_scale = 4.0
+
+[node name="RightHandAnimation" type="AnimationPlayer" parent="Head"]
+libraries = {
+"": SubResource("AnimationLibrary_ir6tu")
+}
 
 [node name="UserInterface" type="Control" parent="."]
 layout_mode = 3
@@ -423,3 +533,5 @@ target_position = Vector3(0, 0.5, 0)
 
 [node name="EditorModule" type="Node" parent="."]
 script = ExtResource("3_v3ckk")
+
+[connection signal="animation_finished" from="Head/RightHandAnimation" to="." method="_on_right_hand_animation_animation_finished"]

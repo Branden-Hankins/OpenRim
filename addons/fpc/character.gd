@@ -1,19 +1,9 @@
-
-# COPYRIGHT Colormatic Studios
-# MIT licence
-# Quality Godot First Person Controller v2
-
-
 extends CharacterBody3D
-
-# TODO: Add descriptions for each value
-
 
 @export_category("Character")
 @export var base_speed : float = 3.0
 @export var sprint_speed : float = 6.0
 @export var crouch_speed : float = 1.0
-
 @export var acceleration : float = 10.0
 @export var jump_velocity : float = 4.5
 @export var mouse_sensitivity : float = 0.1
@@ -26,7 +16,9 @@ extends CharacterBody3D
 @export var HEADBOB_ANIMATION : AnimationPlayer
 @export var JUMP_ANIMATION : AnimationPlayer
 @export var CROUCH_ANIMATION : AnimationPlayer
+@export var RIGHT_HAND_ANIMATION : AnimationPlayer
 @export var COLLISION_MESH : CollisionShape3D
+@onready var hitbox = $Head/Camera/RightHand/RightHandMesh/Hitbox
 
 @export_group("Controls")
 # We are using UI controls because they are built into Godot Engine so they can be used right away
@@ -38,12 +30,7 @@ extends CharacterBody3D
 @export var PAUSE : String = "ui_cancel"
 @export var CROUCH : String = "crouch"
 @export var SPRINT : String = "sprint"
-
-# Uncomment if you want full controller support
-#@export var LOOK_LEFT : String = "look_left"
-#@export var LOOK_RIGHT : String = "look_right"
-#@export var LOOK_UP : String = "look_up"
-#@export var LOOK_DOWN : String = "look_down"
+@export var ATTACK : String = "right_hand_action"
 
 @export_group("Feature Settings")
 @export var jumping_enabled : bool = true
@@ -51,6 +38,7 @@ extends CharacterBody3D
 @export var motion_smoothing : bool = true
 @export var sprint_enabled : bool = true
 @export var crouch_enabled : bool = true
+@export var action_enabled : bool = true
 @export_enum("Hold to Crouch", "Toggle Crouch") var crouch_mode : int = 0
 @export_enum("Hold to Sprint", "Toggle Sprint") var sprint_mode : int = 0
 @export var dynamic_fov : bool = true
@@ -59,7 +47,6 @@ extends CharacterBody3D
 @export var jump_animation : bool = true
 @export var pausing_enabled : bool = true
 @export var gravity_enabled : bool = true
-
 
 # Member variables
 var speed : float = base_speed
@@ -94,6 +81,7 @@ func _ready():
 	HEADBOB_ANIMATION.play("RESET")
 	JUMP_ANIMATION.play("RESET")
 	CROUCH_ANIMATION.play("RESET")
+	RIGHT_HAND_ANIMATION.play("RESET")
 	
 	check_controls()
 
@@ -123,7 +111,9 @@ func check_controls(): # If you add a control, you might want to add a check for
 	if !InputMap.has_action(SPRINT):
 		push_error("No control mapped for sprint. Please add an input map control. Disabling sprinting.")
 		sprint_enabled = false
-
+	if !InputMap.has_action(ATTACK):
+		push_error("No control mapped for attack. Please add an input map control. Disabling action.")
+		action_enabled = false
 
 func change_reticle(reticle): # Yup, this function is kinda strange
 	if RETICLE:
@@ -132,7 +122,6 @@ func change_reticle(reticle): # Yup, this function is kinda strange
 	RETICLE = load(reticle).instantiate()
 	RETICLE.character = self
 	$UserInterface.add_child(RETICLE)
-
 
 func _physics_process(delta):
 	# Big thanks to github.com/LorenzoAncora for the concept of the improved debug values
@@ -182,7 +171,6 @@ func _physics_process(delta):
 	
 	was_on_floor = is_on_floor() # This must always be at the end of physics_process
 
-
 func handle_jumping():
 	if jumping_enabled:
 		if continuous_jumping: # Hold down the jump button
@@ -195,7 +183,6 @@ func handle_jumping():
 				if jump_animation:
 					JUMP_ANIMATION.play("jump", 0.25)
 				velocity.y += jump_velocity
-
 
 func handle_movement(delta, input_dir):
 	var direction = input_dir.rotated(-HEAD.rotation.y)
@@ -222,14 +209,8 @@ func handle_head_rotation():
 	HEAD.rotation_degrees.y -= mouseInput.x * mouse_sensitivity
 	HEAD.rotation_degrees.x -= mouseInput.y * mouse_sensitivity
 	
-	# Uncomment for controller support
-	#var controller_view_rotation = Input.get_vector(LOOK_DOWN, LOOK_UP, LOOK_RIGHT, LOOK_LEFT) * 0.035 # These are inverted because of the nature of 3D rotation.
-	#HEAD.rotation.x += controller_view_rotation.x
-	#HEAD.rotation.y += controller_view_rotation.y
-	
 	mouseInput = Vector2(0,0)
 	HEAD.rotation.x = clamp(HEAD.rotation.x, deg_to_rad(-90), deg_to_rad(90))
-
 
 func handle_state(moving):
 	if sprint_enabled:
@@ -273,11 +254,9 @@ func handle_state(moving):
 						if !$CrouchCeilingDetection.is_colliding():
 							enter_normal_state()
 
-
 # Any enter state function should only be called once when you want to enter that state, not every frame.
 
 func enter_normal_state():
-	#print("entering normal state")
 	var prev_state = state
 	if prev_state == "crouching":
 		CROUCH_ANIMATION.play_backwards("crouch")
@@ -285,27 +264,23 @@ func enter_normal_state():
 	speed = base_speed
 
 func enter_crouch_state():
-	#print("entering crouch state")
 	var prev_state = state
 	state = "crouching"
 	speed = crouch_speed
 	CROUCH_ANIMATION.play("crouch")
 
 func enter_sprint_state():
-	#print("entering sprint state")
 	var prev_state = state
 	if prev_state == "crouching":
 		CROUCH_ANIMATION.play_backwards("crouch")
 	state = "sprinting"
 	speed = sprint_speed
 
-
 func update_camera_fov():
 	if state == "sprinting":
 		CAMERA.fov = lerp(CAMERA.fov, 85.0, 0.3)
 	else:
 		CAMERA.fov = lerp(CAMERA.fov, 75.0, 0.3)
-
 
 func headbob_animation(moving):
 	if moving and is_on_floor():
@@ -334,7 +309,6 @@ func headbob_animation(moving):
 			HEADBOB_ANIMATION.speed_scale = 1
 			HEADBOB_ANIMATION.play("RESET", 1)
 
-
 func _process(delta):
 	$UserInterface/DebugPanel.add_property("FPS", Performance.get_monitor(Performance.TIME_FPS), 0)
 	var status : String = state
@@ -349,9 +323,17 @@ func _process(delta):
 					Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 				Input.MOUSE_MODE_VISIBLE:
 					Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-
+	
+	if Input.is_action_just_pressed("right_hand_action"):
+		RIGHT_HAND_ANIMATION.play("Right_Hand_Punch")
+		hitbox.monitoring = true
 
 func _unhandled_input(event):
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		mouseInput.x += event.relative.x
 		mouseInput.y += event.relative.y
+
+func _on_right_hand_animation_animation_finished(anim_name):
+	if anim_name == "Right_Hand_Punch":
+		RIGHT_HAND_ANIMATION.play("RESET")
+		hitbox.monitoring = false
