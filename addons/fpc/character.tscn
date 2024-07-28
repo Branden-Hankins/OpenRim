@@ -534,4 +534,5 @@ target_position = Vector3(0, 0.5, 0)
 [node name="EditorModule" type="Node" parent="."]
 script = ExtResource("3_v3ckk")
 
+[connection signal="area_entered" from="Head/Camera/RightHand/RightHandMesh/Hitbox" to="." method="_on_hitbox_area_entered"]
 [connection signal="animation_finished" from="Head/RightHandAnimation" to="." method="_on_right_hand_animation_animation_finished"]

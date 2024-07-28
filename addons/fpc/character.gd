@@ -337,3 +337,7 @@ func _on_right_hand_animation_animation_finished(anim_name):
 	if anim_name == "Right_Hand_Punch":
 		RIGHT_HAND_ANIMATION.play("RESET")
 		hitbox.monitoring = false
+
+func _on_hitbox_area_entered(area):
+	if area.is_in_group("npc"):
+		print("debug: hit reg")
